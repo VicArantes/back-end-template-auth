@@ -263,27 +263,26 @@ public class ArchitectureTests {
         return new ArchCondition<>("verify if method lines have not exceeded " + maxLines + " lines") {
             @Override
             public void check(JavaClass javaClass, ConditionEvents events) {
-                if (javaClass.getSource().isPresent() && !javaClass.getSource().get().getUri().getPath().contains("test-classes")) {
-                    if (!javaClass.isInterface()) {
-                        try {
-                            CtClass ctClass = ClassPool.getDefault().get(javaClass.getName());
+                if (javaClass.getSource().isPresent() && !javaClass.getSource().get().getUri().getPath().contains("test-classes") && !javaClass.isInterface()) {
+                    try {
+                        CtClass ctClass = ClassPool.getDefault().get(javaClass.getName());
 
-                            for (Method method : javaClass.reflect().getDeclaredMethods()) {
-                                if (!method.isAnnotationPresent(IgnoreMaxLinesCheck.class) && !method.getName().contains("lambda$")) {
-                                    CtMethod ctMethod = ctClass.getDeclaredMethod(method.getName());
+                        for (Method method : javaClass.reflect().getDeclaredMethods()) {
+                            if (!method.isAnnotationPresent(IgnoreMaxLinesCheck.class) && !method.getName().contains("lambda$")) {
+                                CtMethod ctMethod = ctClass.getDeclaredMethod(method.getName());
 
-                                    int methodLines = ((LineNumberAttribute) ctMethod.getMethodInfo().getCodeAttribute().getAttribute(LineNumberAttribute.tag)).tableLength();
+                                int methodLines = ((LineNumberAttribute) ctMethod.getMethodInfo().getCodeAttribute().getAttribute(LineNumberAttribute.tag)).tableLength();
 
-                                    if (methodLines > maxLines) {
-                                        events.add(SimpleConditionEvent.violated(method, "Class: '" + javaClass.getSimpleName() + "' - Method: '" + method.getName() + "' - lines must not exceed " + maxLines + " lines"));
-                                    }
+                                if (methodLines > maxLines) {
+                                    events.add(SimpleConditionEvent.violated(method, "Class: '" + javaClass.getSimpleName() + "' - Method: '" + method.getName() + "' - lines must not exceed " + maxLines + " lines"));
                                 }
                             }
-                        } catch (NotFoundException e) {
-                            throw new RuntimeException(e);
                         }
+                    } catch (NotFoundException e) {
+                        throw new RuntimeException(e);
                     }
                 }
+
             }
         };
     }
