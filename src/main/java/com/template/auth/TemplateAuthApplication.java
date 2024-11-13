@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Class responsável pela inicialização do projeto.
  */
 @SpringBootApplication
-@OpenAPIDefinition(servers = {@Server(url = "/template-auth/", description = "Default Server URL")})
+@OpenAPIDefinition(servers = {@Server(url = "/template-auth/", description = "Swagger TemplateAuthApplication")})
 public class TemplateAuthApplication {
 
     public static void main(String[] args) {
