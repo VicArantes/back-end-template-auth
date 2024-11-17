@@ -1,0 +1,36 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: template-auth
+
+  cache:
+    cache-names: ${spring.application.name}-cache
+    caffeine:
+      spec: maximumSize=100
+    type: caffeine
+
+  config:
+    import: local.yaml
+
+  datasource:
+    password: ${DB_PASSWORD}
+    username: ${DB_USERNAME}
+
+  jpa:
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    #show-sql: true
+
+template:
+  jwt:
+    secret: templateJwtSecretKey
+    expiration: 86400000
+
+springdoc:
+  swagger-ui:
+    enabled: false
