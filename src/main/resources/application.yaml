@@ -28,7 +28,7 @@ spring:
 
 template:
   jwt:
-    secret: templateJwtSecretKey
+    secret: ${JWT_SECRET}
     expiration: 86400000
 
 springdoc:
