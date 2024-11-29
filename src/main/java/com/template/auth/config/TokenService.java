@@ -55,7 +55,7 @@ public class TokenService {
      */
     public Boolean validatesToken(String token) {
         try {
-            Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token);
+            Jwts.parser().setSigningKey(this.secret).build().parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
@@ -69,7 +69,7 @@ public class TokenService {
      * @return O ID do usuário extraído do token.
      */
     public Long getUserId(String token) {
-        return Long.parseLong(Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token).getBody().getSubject());
+        return Long.parseLong(Jwts.parser().setSigningKey(this.secret).build().parseClaimsJws(token).getBody().getSubject());
     }
 
 }
