@@ -65,7 +65,7 @@ public class User implements UserDetails {
     }
 
     /**
-     * Verifica se as credencias do user não estão expiradas.
+     * Verifica se as credenciais do user não estão expiradas.
      */
     @Override
     public boolean isCredentialsNonExpired() {
