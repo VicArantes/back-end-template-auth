@@ -35,7 +35,7 @@ public class ArchitectureTests {
             @Override
             public void check(JavaClass javaClass, ConditionEvents events) {
                 if (javaClass.getSource().isPresent() && !javaClass.getSource().get().getUri().getPath().contains("test-classes") && !javaClass.getSimpleName().endsWith("Repository")) {
-                    events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - should ends with Repository"));
+                    events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - should ends with Repository".formatted(javaClass.getSimpleName())));
                 }
             }
         };
@@ -46,7 +46,7 @@ public class ArchitectureTests {
             @Override
             public void check(JavaClass javaClass, ConditionEvents events) {
                 if (javaClass.getSource().isPresent() && !javaClass.getSource().get().getUri().getPath().contains("test-classes") && !javaClass.getSimpleName().endsWith("Controller")) {
-                    events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - should ends with Controller"));
+                    events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - should ends with Controller".formatted(javaClass.getSimpleName())));
                 }
             }
         };
@@ -87,19 +87,19 @@ public class ArchitectureTests {
                     }
 
                     if (!hasTableAnnotation) {
-                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + originalClass.getSimpleName() + "' - should be annotated with @Table"));
+                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - should be annotated with @Table".formatted(originalClass.getSimpleName())));
                     }
 
                     if (!hasEntityAnnotation) {
-                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + originalClass.getSimpleName() + "' - should be annotated with @Entity"));
+                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - should be annotated with @Entity".formatted(originalClass.getSimpleName())));
                     }
 
                     if (hasTableAnnotation && !tableNameNotEmpty) {
-                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + originalClass.getSimpleName() + "' - @Table must have 'name' property"));
+                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - @Table must have 'name' property".formatted(originalClass.getSimpleName())));
                     }
 
                     if (hasEntityAnnotation && !entityNameIsEmpty) {
-                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + originalClass.getSimpleName() + "' - @Entity must haven't 'name' property"));
+                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - @Entity must haven't 'name' property".formatted(originalClass.getSimpleName())));
                     }
                 }
             }
@@ -127,7 +127,7 @@ public class ArchitectureTests {
                     }
 
                     if (!idHasRequiredAnnotations) {
-                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + originalClass.getSimpleName() + "' - id field should be Long and be annotated with @Id and @GeneratedValue(strategy = GenerationType.IDENTITY)"));
+                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - id field should be Long and be annotated with @Id and @GeneratedValue(strategy = GenerationType.IDENTITY)".formatted(originalClass.getSimpleName())));
                     }
                 }
             }
@@ -149,7 +149,7 @@ public class ArchitectureTests {
                         }
 
                         if (!hasJakartaAnnotation) {
-                            events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - Field: '" + field.getName() + "' - should be annotated with Jakarta annotation"));
+                            events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Field: '%s' - should be annotated with Jakarta annotation".formatted(javaClass.getSimpleName(), field.getName())));
                         }
                     }
                 }
@@ -165,7 +165,7 @@ public class ArchitectureTests {
                     boolean extendsJpaRepository = javaClass.getInterfaces().stream().anyMatch(interfaceType -> interfaceType.toErasure().isAssignableTo("org.springframework.data.jpa.repository.JpaRepository"));
 
                     if (!javaClass.isInterface() && !extendsJpaRepository) {
-                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - should be interface and extends JpaRepository"));
+                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - should be interface and extends JpaRepository".formatted(javaClass.getSimpleName())));
                     }
                 }
             }
@@ -191,11 +191,11 @@ public class ArchitectureTests {
                     }
 
                     if (!hasServiceAnnotation) {
-                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - should be annotated with @Service"));
+                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - should be annotated with @Service".formatted(javaClass.getSimpleName())));
                     }
 
                     if (!hasTransactionalAnnotation) {
-                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - should be annotated with @Transactional"));
+                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - should be annotated with @Transactional".formatted(javaClass.getSimpleName())));
                     }
                 }
             }
@@ -221,11 +221,11 @@ public class ArchitectureTests {
                     }
 
                     if (!hasRestControllerAnnotation) {
-                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - should be annotated with @RestController"));
+                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - should be annotated with @RestController".formatted(javaClass.getSimpleName())));
                     }
 
                     if (!hasRequestMappingAnnotation) {
-                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - should be annotated with @RequestMapping"));
+                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - should be annotated with @RequestMapping".formatted(javaClass.getSimpleName())));
                     }
                 }
             }
@@ -247,11 +247,11 @@ public class ArchitectureTests {
                                 }
 
                                 if (!hasSpringAnnotation) {
-                                    events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - Method: '" + method.getName() + "' - should have Web annotation"));
+                                    events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Method: '%s' - should have Web annotation".formatted(javaClass.getSimpleName(), method.getName())));
                                 }
                             }
                         } else {
-                            events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - Method: '" + method.getName() + "' - should have Web annotation"));
+                            events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Method: '%s' - should have Web annotation".formatted(javaClass.getSimpleName(), method.getName())));
                         }
                     }
                 }
@@ -260,7 +260,7 @@ public class ArchitectureTests {
     }
 
     public static ArchCondition<JavaClass> satisfyMethodsMustNotExceedMaxLines(int maxLines) {
-        return new ArchCondition<>("verify if method lines have not exceeded " + maxLines + " lines") {
+        return new ArchCondition<>("verify if method lines have not exceeded %d lines".formatted(maxLines)) {
             @Override
             public void check(JavaClass javaClass, ConditionEvents events) {
                 if (javaClass.getSource().isPresent() && !javaClass.getSource().get().getUri().getPath().contains("test-classes") && !javaClass.isInterface()) {
@@ -274,7 +274,7 @@ public class ArchitectureTests {
                                 int methodLines = ((LineNumberAttribute) ctMethod.getMethodInfo().getCodeAttribute().getAttribute(LineNumberAttribute.tag)).tableLength();
 
                                 if (methodLines > maxLines) {
-                                    events.add(SimpleConditionEvent.violated(method, "Class: '" + javaClass.getSimpleName() + "' - Method: '" + method.getName() + "' - lines must not exceed " + maxLines + " lines"));
+                                    events.add(SimpleConditionEvent.violated(method, "Class: '%s' - Method: '%s' - lines must not exceed %d lines".formatted(javaClass.getSimpleName(), method.getName(), maxLines)));
                                 }
                             }
                         }
@@ -294,7 +294,7 @@ public class ArchitectureTests {
                 if (javaClass.getSource().isPresent() && !javaClass.getSource().get().getUri().getPath().contains("test-classes")) {
                     for (JavaMethod method : javaClass.getMethods()) {
                         if (!method.getModifiers().contains(JavaModifier.PUBLIC)) {
-                            events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - Method: '" + method.getName() + "' - should be public"));
+                            events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Method: '%s' - should be public".formatted(javaClass.getSimpleName(), method.getName())));
                         }
                     }
                 }
@@ -309,7 +309,7 @@ public class ArchitectureTests {
                 if (!javaClass.getSimpleName().endsWith("Builder") && javaClass.getSuperclass().isPresent()) {
                     for (JavaField field : javaClass.getFields()) {
                         if (!field.getModifiers().contains(JavaModifier.PRIVATE)) {
-                            events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - Field: '" + field.getName() + "' - should be private"));
+                            events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Field: '%s' - should be private".formatted(javaClass.getSimpleName(), field.getName())));
                         }
                     }
                 }
@@ -324,7 +324,7 @@ public class ArchitectureTests {
                 if (javaClass.getSource().isPresent() && !javaClass.getSource().get().getUri().getPath().contains("test-classes")) {
                     for (JavaMethod method : javaClass.getMethods()) {
                         if (!method.getReturnType().toErasure().isAssignableTo(ResponseEntity.class)) {
-                            events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - Method: '" + method.getName() + "' - should return ResponseEntity"));
+                            events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Method: '%s' - should return ResponseEntity".formatted(javaClass.getSimpleName(), method.getName())));
                         }
                     }
                 }
@@ -365,10 +365,10 @@ public class ArchitectureTests {
                                 }
 
                                 if (!allParamsHaveParamAnnotation) {
-                                    events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - Method: '" + method.getName() + "' - Parameter - '" + paramName + "' - should has @Param"));
+                                    events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Method: '%s' - Parameter - '%s' - should has @Param".formatted(javaClass.getSimpleName(), method.getName(), paramName)));
                                 }
                             } else if (!parameter.getType().toErasure().isAssignableTo(Pageable.class)) {
-                                events.add(SimpleConditionEvent.violated(javaClass, "Class: '" + javaClass.getSimpleName() + "' - Method: '" + method.getName() + "' - Parameter - '" + paramName + "' - should has @Param"));
+                                events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Method: '%s' - Parameter - '%s' - should has @Param".formatted(javaClass.getSimpleName(), method.getName(), paramName)));
                             }
                         }
                     }
