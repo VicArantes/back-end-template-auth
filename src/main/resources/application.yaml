@@ -19,8 +19,6 @@ spring:
     username: ${DB_USERNAME}
 
   jpa:
-    database: POSTGRESQL
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     open-in-view: false
