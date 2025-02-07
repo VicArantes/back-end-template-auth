@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnTransformer;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Set;
+
 /**
  * Entidade que representa um perfil.
  */
@@ -15,8 +17,8 @@ import org.springframework.security.core.GrantedAuthority;
 @Data
 @Entity
 @NoArgsConstructor
-@Table(name = "authorities")
-public class Authority implements GrantedAuthority {
+@Table(name = "roles")
+public class Role implements GrantedAuthority {
 
     /**
      * Identificador único do perfil.
@@ -28,14 +30,20 @@ public class Authority implements GrantedAuthority {
     /**
      * Authority Name do perfil.
      */
-    @Column(name = "tx_authority_name", unique = true)
+    @Column(name = "tx_nome", unique = true)
     @ColumnTransformer(write = "UPPER(?)")
     @NotBlank
-    private String authorityName;
+    private String nome;
+
+    /**
+     * Lista das permissões da role.
+     */
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Permissao> permissoes;
 
     @Override
     public String getAuthority() {
-        return authorityName;
+        return "";
     }
 
 }

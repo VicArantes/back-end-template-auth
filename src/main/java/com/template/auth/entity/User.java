@@ -6,8 +6,10 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -46,7 +48,12 @@ public class User implements UserDetails {
      */
     @ManyToMany(fetch = FetchType.EAGER)
     @NotEmpty
-    private List<Authority> authorities;
+    private List<Role> roles;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
 
     /**
      * Verifica se a conta do user não está expirada.

@@ -1,3 +1,6 @@
+api:
+  key: ${AUTH_API_KEY}
+
 server:
   port: 8083
 
