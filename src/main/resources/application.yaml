@@ -10,15 +10,12 @@ spring:
   application:
     name: template-auth
 
-  mvc:
-    pathmatch:
-      matching-strategy: ANT_PATH_MATCHER
-
   cache:
     cache-names: ${spring.application.name}-cache
     caffeine:
       spec: maximumSize=100
     type: caffeine
+
   config:
     import: local.yaml
 
@@ -31,6 +28,10 @@ spring:
       ddl-auto: update
     open-in-view: false
     #show-sql: true
+
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
 
 template:
   jwt:
