@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://207.180.200.244:5432/template
+    url: jdbc:postgresql://localhost:5432/template
 
 eureka:
   client:

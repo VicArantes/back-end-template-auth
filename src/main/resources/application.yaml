@@ -5,19 +5,20 @@ server:
   port: 8083
   servlet:
     context-path: /template-auth
+
 spring:
+  application:
+    name: template-auth
+
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
-  application:
-    name: template-auth
 
   cache:
     cache-names: ${spring.application.name}-cache
     caffeine:
       spec: maximumSize=100
     type: caffeine
-
   config:
     import: local.yaml
 
