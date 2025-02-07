@@ -3,8 +3,12 @@ api:
 
 server:
   port: 8083
-
+  servlet:
+    context-path: /template-auth
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
   application:
     name: template-auth
 
