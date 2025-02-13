@@ -3,14 +3,17 @@ package com.template.auth.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnTransformer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Entidade que representa um user.
@@ -30,49 +33,67 @@ public class User implements UserDetails {
     private Long id;
 
     /**
-     * Username do user.
+     * Username do usuário.
      */
     @Column(name = "tx_username", unique = true)
     @NotBlank
     private String username;
 
     /**
-     * Password do user.
+     * Password do usuário.
      */
     @Column(name = "tx_password")
     @NotBlank
     private String password;
 
     /**
-     * Lista de authorities do user.
+     * Email do usuário.
+     */
+    @Column(name = "tx_email", unique = true)
+    @ColumnTransformer(write = "LOWER(?)")
+    @NotBlank
+    private String email;
+
+    /**
+     * Identificador para verificar se o usuário está ativo.
+     */
+    @Column(name = "bl_ativo")
+    @NotNull
+    private boolean ativo;
+
+    /**
+     * Lista de roles do usuário.
      */
     @ManyToMany(fetch = FetchType.EAGER)
     @NotEmpty
-    private List<Role> roles;
+    private Set<Role> roles;
 
+    /**
+     * Pega todas as roles do usuário.
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return this.getRoles();
     }
 
     /**
-     * Verifica se a conta do user não está expirada.
+     * Verifica se a conta do usuário não está expirada.
      */
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return this.isAtivo();
     }
 
     /**
-     * Verifica se a conta do user não está bloqueada.
+     * Verifica se a conta do usuário não está bloqueada.
      */
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return this.isAtivo();
     }
 
     /**
-     * Verifica se as credenciais do user não estão expiradas.
+     * Verifica se as credencias do usuário não estão expiradas.
      */
     @Override
     public boolean isCredentialsNonExpired() {
@@ -80,10 +101,10 @@ public class User implements UserDetails {
     }
 
     /**
-     * Verifica se o user está habilitado.
+     * Verifica se o usuário está habilitado.
      */
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.isAtivo();
     }
 }

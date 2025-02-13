@@ -1,6 +1,7 @@
 package com.template.auth.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,15 +24,17 @@ public class Permissao {
     private Long id;
 
     /**
-     * Descrição da permissão.
+     * Nome da permissão.
      */
-    @Column(name = "tx_descricao")
-    private String descricao;
+    @Column(name = "tx_nome")
+    @NotBlank
+    private String nome;
 
     /**
-     * URI da permissão.
+     * Endpoint da permissão.
      */
-    @Column(name = "tx_uri")
-    private String uri;
+    @Column(name = "tx_endpoint", unique = true)
+    @NotBlank
+    private String endpoint;
 
 }

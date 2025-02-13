@@ -11,7 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Set;
 
 /**
- * Entidade que representa um perfil.
+ * Entidade que representa uma role.
  */
 @AllArgsConstructor
 @Data
@@ -21,14 +21,14 @@ import java.util.Set;
 public class Role implements GrantedAuthority {
 
     /**
-     * Identificador único do perfil.
+     * Identificador único da role.
      */
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
 
     /**
-     * Authority Name do perfil.
+     * Nome da role.
      */
     @Column(name = "tx_nome", unique = true)
     @ColumnTransformer(write = "UPPER(?)")
@@ -36,14 +36,14 @@ public class Role implements GrantedAuthority {
     private String nome;
 
     /**
-     * Lista das permissões da role.
+     * Lista dos grupos de acesso da role.
      */
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Permissao> permissoes;
+    @OneToMany(fetch = FetchType.EAGER)
+    private Set<GrupoAcesso> grupoAcesso;
 
     @Override
     public String getAuthority() {
-        return "";
+        return this.getNome();
     }
 
 }
