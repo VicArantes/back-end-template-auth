@@ -1,6 +1,15 @@
 api:
   key: ${AUTH_API_KEY}
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL}
+
+logging:
+  file:
+    name: ${LOG_PATH}/${spring.application.name}.log
+
 server:
   port: 8083
   servlet:
@@ -16,11 +25,9 @@ spring:
       spec: maximumSize=100
     type: caffeine
 
-  config:
-    import: local.yaml
-
   datasource:
     password: ${DB_PASSWORD}
+    url: ${DB_URL}
     username: ${DB_USERNAME}
 
   jpa:
