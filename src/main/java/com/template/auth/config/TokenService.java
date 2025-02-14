@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.template.auth.JWTException;
 import com.template.auth.UnauthorizedException;
+import com.template.auth.entity.Permissao;
 import com.template.auth.entity.User;
 import com.template.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Serviço responsável por gerar, validar e extrair informações do usuário de um JSON WebToken (JWT).
@@ -120,25 +123,6 @@ public class TokenService {
     }
 
     /**
-     * Verifica se o usuário tem permissão para acessar o caminho solicitado.
-     *
-     * @param path O caminho a ser acessado.
-     * @param u    O usuário que está fazendo a requisição.
-     * @return true se o usuário tiver permissão, false caso contrário.
-     */
-    private static boolean isAllowedToAccess(String path, User u) {
-        return u.getRoles().stream().anyMatch(role -> role.getPermissoes().stream().anyMatch(permissao -> {
-            String permissaoTemp = permissao.getUri();
-
-            if (path.matches(".*\\d.*")) {
-                permissaoTemp = permissaoTemp.replace("{id}", "");
-            }
-
-            return path.contains(permissaoTemp);
-        }));
-    }
-
-    /**
      * Obtém o usuário associado a um token.
      *
      * @param token O token JWT do qual extrair o usuário.
@@ -166,20 +150,12 @@ public class TokenService {
     public void validateAuthorization(String path, String token) {
         Optional.ofNullable(this.getUser(token))
                 .map(userId -> {
-                    userRepository.findById(Long.parseLong(userId))
-                            .map(u -> {
-                                if (isAllowedToAccess(path, u))
-                                    return true;
+                    List<String> splitPath = List.of(path.split("/"));
+                    String delimiter = path.startsWith("/") ? "/" : "";
+                    String pathWithoutPrefix = delimiter + splitPath.stream().skip(2).collect(Collectors.joining("/"));
 
-                                LOG.error("User has no authorization to access path [{}]", path);
-                                throw new UnauthorizedException(String.format("User has no authorization to access path %s", path));
-                            })
-                            .orElseThrow(() -> {
-                                LOG.error("User not found with id [{}]", userId);
-                                return new UnauthorizedException(String.format("User not found with login %s", userId));
-                            });
-
-                    return true;
+                    //TODO AJUSTAR VALIDAÇÃO EX:REQUISIÇÃO JA FAZ A CONSULTA CORRETAMENTO, MAS PRECISA AJUSTAR O AUTHENTICATIONFILTER
+                    return userRepository.verificaPermissaoUsuarioEndpoint(Long.parseLong(userId), pathWithoutPrefix);
                 })
                 .orElseThrow(() -> {
                     LOG.error("User not found within token");

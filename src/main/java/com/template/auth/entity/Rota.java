@@ -27,20 +27,6 @@ public class Rota {
     private Long id;
 
     /**
-     * Descrição da rota.
-     */
-    @Column(name = "tx_descricao")
-    @NotBlank
-    private String descricao;
-
-    /**
-     * URL da rota.
-     */
-    @Column(name = "tx_url", unique = true)
-    @NotBlank
-    private String url;
-
-    /**
      * Lista de permissões da rota.
      */
     @ManyToMany(fetch = FetchType.EAGER)

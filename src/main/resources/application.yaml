@@ -1,5 +1,5 @@
 api:
-  key: ${AUTH_API_KEY}
+  key: ${TEMPLATE_AUTH_API_KEY}
 
 eureka:
   client:
