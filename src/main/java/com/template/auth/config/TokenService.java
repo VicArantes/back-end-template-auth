@@ -154,8 +154,11 @@ public class TokenService {
                     String delimiter = path.startsWith("/") ? "/" : "";
                     String pathWithoutPrefix = delimiter + splitPath.stream().skip(2).collect(Collectors.joining("/"));
 
-                    //TODO AJUSTAR VALIDAÇÃO EX:REQUISIÇÃO JA FAZ A CONSULTA CORRETAMENTO, MAS PRECISA AJUSTAR O AUTHENTICATIONFILTER
-                    return userRepository.verificaPermissaoUsuarioEndpoint(Long.parseLong(userId), pathWithoutPrefix);
+                    if(!userRepository.verificaPermissaoUsuarioEndpoint(Long.parseLong(userId), pathWithoutPrefix)) {
+                        throw new UnauthorizedException("USUÁRIO SEM PERMISSÃO AO ENDPOINT");
+                    }
+
+                    return true;
                 })
                 .orElseThrow(() -> {
                     LOG.error("User not found within token");
