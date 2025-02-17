@@ -30,4 +30,11 @@ public class GrupoAcesso {
     @NotNull
     private Rota rota;
 
+    /**
+     * Identificador para verificar se o grupo de acesso está ativo.
+     */
+    @Column(name = "bl_ativo")
+    @NotNull
+    private boolean ativo;
+
 }

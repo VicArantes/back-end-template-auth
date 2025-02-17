@@ -26,6 +26,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "           INNER JOIN permissoes p ON p.id = rp.permissoes_id                                              " +
             "       WHERE                                                                                               " +
             "           u.id = :userId                                                                                  " +
+            "           and u.ativo = TRUE                                                                              " +
+            "           and r.ativo = TRUE                                                                              " +
+            "           and ga.ativo = TRUE                                                                             " +
+            "           and r2.ativo = TRUE                                                                             " +
+            "           and p.ativo = TRUE                                                                              " +
             "           and :requestedPath ~ ('^' || REGEXP_REPLACE(p.tx_endpoint, '\\{[^/]+\\}', '[^/]+', 'g') || '$') ", nativeQuery = true)
     boolean verificaPermissaoUsuarioEndpoint(@Param("userId") long userId, @Param("requestedPath") String requestedPath);
 

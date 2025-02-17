@@ -2,6 +2,7 @@ package com.template.auth.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,6 +41,13 @@ public class Role implements GrantedAuthority {
      */
     @OneToMany(fetch = FetchType.EAGER)
     private Set<GrupoAcesso> grupoAcesso;
+
+    /**
+     * Identificador para verificar se a role está ativa.
+     */
+    @Column(name = "bl_ativo")
+    @NotNull
+    private boolean ativo;
 
     @Override
     public String getAuthority() {
