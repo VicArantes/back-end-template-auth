@@ -25,13 +25,6 @@ public class Permissao {
     private Long id;
 
     /**
-     * Nome da permissão.
-     */
-    @Column(name = "tx_nome")
-    @NotBlank
-    private String nome;
-
-    /**
      * Endpoint da permissão.
      */
     @Column(name = "tx_endpoint", unique = true)
