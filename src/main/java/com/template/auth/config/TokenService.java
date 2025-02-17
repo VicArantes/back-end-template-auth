@@ -3,10 +3,9 @@ package com.template.auth.config;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.template.auth.JWTException;
-import com.template.auth.UnauthorizedException;
-import com.template.auth.entity.Permissao;
 import com.template.auth.entity.User;
+import com.template.auth.exception.JWTException;
+import com.template.auth.exception.UnauthorizedException;
 import com.template.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -56,11 +56,11 @@ public class TokenService {
         Date expirationDate = new Date(today.getTime() + Long.parseLong(expiration));
 
         return JWT.create()
-                .withIssuer(ISSUER) // Define o emissor do token
-                .withSubject(user.getId().toString()) // Define o identificador do usuário
-                .withIssuedAt(today) // Define a data de emissão
-                .withExpiresAt(expirationDate) // Define a data de expiração
-                .sign(Algorithm.HMAC256(jwtSecret)); // Assina com o algoritmo correto
+                .withIssuer(ISSUER)
+                .withSubject(user.getId().toString())
+                .withIssuedAt(today)
+                .withExpiresAt(expirationDate)
+                .sign(Algorithm.HMAC256(jwtSecret));
     }
 
     /**
@@ -76,7 +76,7 @@ public class TokenService {
                     .verify(token);
             return true;
         } catch (JWTVerificationException e) {
-            LOG.error("{} - [ validatesToken ] - Token inválido: {}", CLASS, e.getMessage());
+            LOG.error("{} - [ validatesToken ] - TOKEN INVÁLIDO: {}", CLASS, e.getMessage());
             return false;
         }
     }
@@ -108,17 +108,17 @@ public class TokenService {
     /**
      * Valida o token, retornando true ou false.
      */
-    public boolean validateToken(String token) {
+    public void validateToken(String token) {
         try {
             JWT.require(Algorithm.HMAC256(jwtSecret)) // Usa a chave secreta
                     .withIssuer(ISSUER)
                     .build()
                     .verify(token)
                     .getSubject(); // Se o token for válido, retorna o subject
-            return true;
         } catch (JWTVerificationException e) {
-            LOG.error("{} - [ validateToken ] - Erro ao validar o token: {}", CLASS, e.getMessage());
-            throw new JWTException(e.getMessage());
+            String errorMessage = MessageFormat.format("{0} - [ validateToken ] - ERRO AO VALIDAR O TOKEN: {1}", CLASS, e.getMessage());
+            LOG.error(errorMessage, e);
+            throw new JWTException(errorMessage);
         }
     }
 
@@ -130,14 +130,15 @@ public class TokenService {
      */
     public String getUser(String token) {
         try {
-            return JWT.require(Algorithm.HMAC256(jwtSecret)) // Usa a chave secreta
+            return JWT.require(Algorithm.HMAC256(jwtSecret))
                     .withIssuer(ISSUER)
                     .build()
                     .verify(token)
-                    .getSubject(); // Retorna o subject (nome do usuário)
+                    .getSubject();
         } catch (JWTVerificationException e) {
-            LOG.error("{} - [ getUser ] - Erro ao obter usuário do token: {}", CLASS, e.getMessage());
-            throw new JWTException(e.getMessage());
+            String errorMessage = MessageFormat.format("{0} - [ getUser ] - ERRO AO OBTER USUÁRIO DO TOKEN: {1}", CLASS, e.getMessage());
+            LOG.error(errorMessage, e);
+            throw new JWTException(errorMessage);
         }
     }
 
@@ -154,15 +155,15 @@ public class TokenService {
                     String delimiter = path.startsWith("/") ? "/" : "";
                     String pathWithoutPrefix = delimiter + splitPath.stream().skip(2).collect(Collectors.joining("/"));
 
-                    if(!userRepository.verificaPermissaoUsuarioEndpoint(Long.parseLong(userId), pathWithoutPrefix)) {
+                    if (!userRepository.verificaPermissaoUsuarioEndpoint(Long.parseLong(userId), pathWithoutPrefix)) {
                         throw new UnauthorizedException("USUÁRIO SEM PERMISSÃO AO ENDPOINT");
                     }
 
                     return true;
                 })
                 .orElseThrow(() -> {
-                    LOG.error("User not found within token");
-                    return new UnauthorizedException("User not found within token");
+                    LOG.error("USUÁRIO NÃO ENCONTRADO COM O TOKEN FORNECIDO");
+                    return new UnauthorizedException("USUÁRIO NÃO ENCONTRADO COM O TOKEN FORNECIDO");
                 });
     }
 }

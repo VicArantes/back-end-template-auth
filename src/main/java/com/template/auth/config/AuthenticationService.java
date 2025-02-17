@@ -30,7 +30,7 @@ public class AuthenticationService implements UserDetailsService {
         Optional<User> optionalUser = repository.findByUsername(username);
 
         if (optionalUser.isEmpty()) {
-            throw new UsernameNotFoundException("Usuário não encontrado!");
+            throw new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO!");
         } else {
             return optionalUser.get();
         }
