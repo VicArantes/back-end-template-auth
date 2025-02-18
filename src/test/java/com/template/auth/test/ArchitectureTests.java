@@ -1,5 +1,6 @@
-package com.template.auth;
+package com.template.auth.test;
 
+import com.template.auth.TemplateAuthApplication;
 import com.template.auth.util.annotation.IgnoreMaxLinesCheck;
 import com.tngtech.archunit.core.domain.*;
 import com.tngtech.archunit.junit.AnalyzeClasses;
