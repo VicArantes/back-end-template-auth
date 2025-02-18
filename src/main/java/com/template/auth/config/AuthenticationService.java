@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * Esta classe é um serviço de autenticação que implementa a interface UserDetailsService do Spring Security.
  */
@@ -25,12 +27,12 @@ public class AuthenticationService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = repository.findByUsername(username);
+        Optional<User> optionalUser = repository.findByUsername(username);
 
-        if (user == null) {
-            throw new UsernameNotFoundException("Usuário não encontrado!");
+        if (optionalUser.isEmpty()) {
+            throw new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO!");
         } else {
-            return user;
+            return optionalUser.get();
         }
     }
 

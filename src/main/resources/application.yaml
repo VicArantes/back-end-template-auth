@@ -1,3 +1,6 @@
+api:
+  key: ${TEMPLATE_AUTH_API_KEY}
+
 eureka:
   client:
     serviceUrl:
@@ -9,6 +12,8 @@ logging:
 
 server:
   port: 8083
+  servlet:
+    context-path: /template-auth
 
 spring:
   application:
@@ -30,6 +35,10 @@ spring:
       ddl-auto: update
     open-in-view: false
     #show-sql: true
+
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
 
 template:
   jwt:

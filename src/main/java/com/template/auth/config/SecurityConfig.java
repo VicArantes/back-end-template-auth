@@ -26,6 +26,8 @@ public class SecurityConfig {
     private final TokenService tokenService;
     private final UserService userService;
 
+    private static final String[] PUBLIC = {"/api/auth/**", "/swagger-ui.html/**", "/v3/api-docs/**", "/swagger-ui/**"};
+
     /**
      * Configura o filtro de segurança para as requisições HTTP.
      *
@@ -35,12 +37,16 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/*", "/swagger-ui.html/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        .anyRequest().authenticated())
-                .addFilterBefore(new AuthenticationFilter(tokenService, userService), UsernamePasswordAuthenticationFilter.class)
+        http
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .authorizeHttpRequests(authorize ->
+                        authorize
+                                .requestMatchers(PUBLIC).permitAll()
+                                .anyRequest()
+                                .authenticated())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(new AuthenticationFilter(tokenService, userService), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
