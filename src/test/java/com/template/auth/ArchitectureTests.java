@@ -27,7 +27,7 @@ import java.lang.reflect.Method;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
-@AnalyzeClasses(packages = "com.template.auth")
+@AnalyzeClasses(packagesOf = TemplateAuthApplication.class)
 public class ArchitectureTests {
 
     public static ArchCondition<JavaClass> satisfyRepositoryHasCorrectEndingName() {
