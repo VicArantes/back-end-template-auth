@@ -15,16 +15,21 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.LineNumberAttribute;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
@@ -318,14 +323,47 @@ public class ArchitectureTests {
         };
     }
 
-    public static ArchCondition<JavaClass> satisfyControllersMethodsReturnResponseEntity() {
-        return new ArchCondition<>("verify if controller are returning ResponseEntity") {
+    /**
+     * Obtém o primeiro tipo genérico de um JavaType convertido para JavaClass.
+     */
+    private static JavaClass getFirstGenericType(JavaType javaType) {
+        return javaType instanceof JavaClass javaClass
+                ? javaClass.getAllRawInterfaces().stream().findFirst().orElse(null)
+                : null;
+    }
+
+    public static ArchCondition<JavaClass> satisfyControllersMethodsReturnResponseEntityAndUseRecords() {
+        return new ArchCondition<>("verify if controllers return ResponseEntity and use records") {
             @Override
             public void check(JavaClass javaClass, ConditionEvents events) {
                 if (javaClass.getSource().isPresent() && !javaClass.getSource().get().getUri().getPath().contains("test-classes")) {
                     for (JavaMethod method : javaClass.getMethods()) {
-                        if (!method.getReturnType().toErasure().isAssignableTo(ResponseEntity.class)) {
+
+                        JavaClass returnType = method.getReturnType().toErasure();
+                        if (!returnType.isAssignableTo(ResponseEntity.class)) {
                             events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Method: '%s' - should return ResponseEntity".formatted(javaClass.getSimpleName(), method.getName())));
+                            continue;
+                        }
+
+                        for (JavaParameter param : method.getParameters()) {
+                            if (param.isAnnotatedWith(RequestBody.class)) {
+                                JavaClass paramType = param.getRawType();
+                                if (!paramType.isRecord()) {
+                                    events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Method: '%s' - @RequestBody parameter '%s' should be a record".formatted(javaClass.getSimpleName(), method.getName(), paramType.getSimpleName())));
+                                }
+                            }
+                        }
+
+                        JavaClass genericType = getFirstGenericType(method.getReturnType());
+                        if (genericType != null && !genericType.isEquivalentTo(Void.class)) {
+                            if (genericType.isAssignableTo(List.class) || genericType.isAssignableTo(Page.class) || genericType.isAssignableTo(Set.class)) {
+                                JavaClass innerGenericType = getFirstGenericType(genericType);
+                                if (innerGenericType != null && !innerGenericType.isRecord()) {
+                                    events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Method: '%s' - ResponseEntity<List/Page/Set> should contain records, but found: %s".formatted(javaClass.getSimpleName(), method.getName(), innerGenericType.getSimpleName())));
+                                }
+                            } else if (!genericType.isRecord()) {
+                                events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Method: '%s' - ResponseEntity body should be a record, but found: %s".formatted(javaClass.getSimpleName(), method.getName(), genericType.getSimpleName())));
+                            }
                         }
                     }
                 }
@@ -372,6 +410,30 @@ public class ArchitectureTests {
                                 events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Method: '%s' - Parameter - '%s' - should has @Param".formatted(javaClass.getSimpleName(), method.getName(), paramName)));
                             }
                         }
+                    }
+                }
+            }
+        };
+    }
+
+    public static ArchCondition<JavaClass> satisfyEntitiesShouldHaveAtivoField() {
+        return new ArchCondition<>("Entities should have a boolean 'ativo' field with @Column(name = \"bl_ativo\")") {
+            @Override
+            public void check(JavaClass javaClass, ConditionEvents events) {
+                if (javaClass.isAnnotatedWith(Entity.class)) {
+                    Optional<JavaField> ativoField = javaClass.getFields().stream().filter(field -> field.getName().equals("ativo") && field.getRawType().isEquivalentTo(boolean.class)).findFirst();
+
+                    if (ativoField.isPresent()) {
+                        JavaField field = ativoField.get();
+                        Optional<Column> columnAnnotation = field.tryGetAnnotationOfType(Column.class);
+
+                        boolean hasCorrectColumnAnnotation = columnAnnotation.map(annotation -> "bl_ativo".equals(annotation.name())).orElse(false);
+
+                        if (!hasCorrectColumnAnnotation) {
+                            events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Field: 'ativo' must have @Column(name = \"bl_ativo\")".formatted(javaClass.getSimpleName())));
+                        }
+                    } else {
+                        events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' must have a boolean field named 'ativo' with @Column(name = \"bl_ativo\")".formatted(javaClass.getSimpleName())));
                     }
                 }
             }
@@ -498,15 +560,21 @@ public class ArchitectureTests {
             .allowEmptyShould(true);
 
     @ArchTest
-    public static final ArchRule controllersShould_SatisfyControllersMethodsReturnResponseEntity = classes()
+    public static final ArchRule controllersShould_SatisfyControllersMethodsReturnResponseEntityAndUseRecords = classes()
             .that().resideInAPackage("..controller..")
-            .should(satisfyControllersMethodsReturnResponseEntity())
+            .should(satisfyControllersMethodsReturnResponseEntityAndUseRecords())
             .allowEmptyShould(true);
 
     @ArchTest
     public static final ArchRule repositoriesShould_SatisfyRepositoriesParametersMethodsHasParamAnnotation = classes()
             .that().resideInAPackage("..repository..")
             .should(satisfyRepositoriesParametersMethodsHasParamAnnotation())
+            .allowEmptyShould(true);
+
+    @ArchTest
+    public static final ArchRule repositoriesShould_SatisfyEntitiesShouldHaveAtivoField = classes()
+            .that().resideInAPackage("..entity..")
+            .should(satisfyEntitiesShouldHaveAtivoField())
             .allowEmptyShould(true);
 
 }
