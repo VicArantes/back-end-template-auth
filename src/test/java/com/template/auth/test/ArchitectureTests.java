@@ -326,11 +326,19 @@ public class ArchitectureTests {
     /**
      * Obtém o primeiro tipo genérico de um JavaType convertido para JavaClass.
      */
-    private static JavaClass getFirstGenericType(JavaType javaType) {
-        return javaType instanceof JavaClass javaClass
-                ? javaClass.getAllRawInterfaces().stream().findFirst().orElse(null)
-                : null;
+    private static JavaClass getFirstGenericType(JavaType returnType) {
+        if (returnType instanceof JavaParameterizedType parameterizedType) {
+            List<JavaType> actualTypeArguments = parameterizedType.getActualTypeArguments();
+
+            if (!actualTypeArguments.isEmpty()) {
+                JavaType firstType = actualTypeArguments.getFirst();
+                return firstType.toErasure();
+            }
+        }
+
+        return null;
     }
+
 
     public static ArchCondition<JavaClass> satisfyControllersMethodsReturnResponseEntityAndUseRecords() {
         return new ArchCondition<>("verify if controllers return ResponseEntity and use records") {
@@ -338,8 +346,8 @@ public class ArchitectureTests {
             public void check(JavaClass javaClass, ConditionEvents events) {
                 if (javaClass.getSource().isPresent() && !javaClass.getSource().get().getUri().getPath().contains("test-classes")) {
                     for (JavaMethod method : javaClass.getMethods()) {
-
                         JavaClass returnType = method.getReturnType().toErasure();
+
                         if (!returnType.isAssignableTo(ResponseEntity.class)) {
                             events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Method: '%s' - should return ResponseEntity".formatted(javaClass.getSimpleName(), method.getName())));
                             continue;
@@ -348,6 +356,7 @@ public class ArchitectureTests {
                         for (JavaParameter param : method.getParameters()) {
                             if (param.isAnnotatedWith(RequestBody.class)) {
                                 JavaClass paramType = param.getRawType();
+
                                 if (!paramType.isRecord()) {
                                     events.add(SimpleConditionEvent.violated(javaClass, "Class: '%s' - Method: '%s' - @RequestBody parameter '%s' should be a record".formatted(javaClass.getSimpleName(), method.getName(), paramType.getSimpleName())));
                                 }
@@ -355,6 +364,7 @@ public class ArchitectureTests {
                         }
 
                         JavaClass genericType = getFirstGenericType(method.getReturnType());
+
                         if (genericType != null && !genericType.isEquivalentTo(Void.class)) {
                             if (genericType.isAssignableTo(List.class) || genericType.isAssignableTo(Page.class) || genericType.isAssignableTo(Set.class)) {
                                 JavaClass innerGenericType = getFirstGenericType(genericType);
