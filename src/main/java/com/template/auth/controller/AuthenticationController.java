@@ -1,5 +1,6 @@
-package com.template.auth.config;
+package com.template.auth.controller;
 
+import com.template.auth.config.TokenService;
 import com.template.auth.dto.LoginFormDTO;
 import com.template.auth.dto.PathRequestDTO;
 import jakarta.validation.Valid;
