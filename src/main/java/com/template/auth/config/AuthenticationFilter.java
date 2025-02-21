@@ -1,6 +1,7 @@
 package com.template.auth.config;
 
 import com.template.auth.entity.User;
+import com.template.auth.service.TokenService;
 import com.template.auth.service.UserService;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;

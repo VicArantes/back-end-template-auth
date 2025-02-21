@@ -1,5 +1,7 @@
 package com.template.auth.config;
 
+import com.template.auth.service.AuthenticationService;
+import com.template.auth.service.TokenService;
 import com.template.auth.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

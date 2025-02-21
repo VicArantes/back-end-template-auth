@@ -1,4 +1,4 @@
-package com.template.auth.config;
+package com.template.auth.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

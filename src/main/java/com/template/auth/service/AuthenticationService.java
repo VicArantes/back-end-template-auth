@@ -1,4 +1,4 @@
-package com.template.auth.config;
+package com.template.auth.service;
 
 import com.template.auth.entity.User;
 import com.template.auth.repository.UserRepository;
